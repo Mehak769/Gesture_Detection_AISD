@@ -1,7 +1,5 @@
-dataset/raw/
 .venv/
 __pycache__/
 *.pyc
 *.pkl
 .vscode/
-my_training_data/
