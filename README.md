@@ -1,4 +1,3 @@
-
 # Gesture Detection AISD Project
 **Deggendorf Institute of Technology**
 Course: AI for Smart Devices (AISD)
@@ -191,6 +190,15 @@ The system successfully detects all 3 gestures in real-time:
 | thumbs_up | ~0.56 |
 | thumbs_down | ~0.59 |
 | open_hand | ~0.56 |
+
+### 👍 Thumbs Up Detection
+![Thumbs Up](results/thumbs_up.jpeg)
+
+### 👎 Thumbs Down Detection
+![Thumbs Down](results/thumbs_down.jpeg)
+
+### ✋ Open Hand Detection
+![Open Hand](results/open_hand.jpeg)
 
 ---
 
