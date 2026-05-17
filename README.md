@@ -52,7 +52,7 @@ python collect_images.py
 
 ---
 
-## Step 2 — Data Labeling
+## Step 2 - Data Labeling
 
 Images were labeled using **Label Studio**:
 
