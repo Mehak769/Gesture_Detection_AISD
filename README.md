@@ -1,4 +1,4 @@
-# Gesture_Detection_AISD
+
 # Gesture Detection AISD Project
 **Deggendorf Institute of Technology**
 Course: AI for Smart Devices (AISD)
