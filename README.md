@@ -7,9 +7,9 @@ Team: aisd_user12
 
 ## Project Overview
 This project implements a real-time hand gesture detection system using a Raspberry Pi 5 with an IMX500 AI Camera. The system detects three hand gestures:
-- ✋ `open_hand` — Open hand with fingers spread
-- 👍 `thumbs_up` — Thumb pointing up
-- 👎 `thumbs_down` — Thumb pointing down
+- ✋ `open_hand` - Open hand with fingers spread
+- 👍 `thumbs_up` - Thumb pointing up
+- 👎 `thumbs_down` - Thumb pointing down
 
 ---
 
@@ -39,7 +39,7 @@ Gesture_Detection_AISD/
 
 ---
 
-## Step 1 — Data Collection
+## Step 1 - Data Collection
 
 Images were captured using the Raspberry Pi IMX500 AI Camera:
 
@@ -67,7 +67,7 @@ label-studio
 
 ---
 
-## Step 3 — Data Preparation (Linux Workstation)
+## Step 3 - Data Preparation (Linux Workstation)
 
 SSH into the Linux workstation:
 
@@ -100,7 +100,7 @@ names:
 
 ---
 
-## Step 4 — Model Training (Linux Workstation)
+## Step 4 - Model Training (Linux Workstation)
 
 Train the YOLO11n model:
 
@@ -126,7 +126,7 @@ Output: `runs/detect/train-4/weights/best.pt`
 
 ---
 
-## Step 5 — Export to IMX Format (Linux Workstation)
+## Step 5 - Export to IMX Format (Linux Workstation)
 
 Install export tools:
 
@@ -148,7 +148,7 @@ Output: `runs/detect/train-4/weights/best_imx_model/packerOut.zip`
 
 ---
 
-## Step 6 — Convert to RPK (Raspberry Pi)
+## Step 6 - Convert to RPK (Raspberry Pi)
 
 Install IMX tools:
 
@@ -166,7 +166,7 @@ Output: `network.rpk`
 
 ---
 
-## Step 7 — Run Gesture Detection (Raspberry Pi)
+## Step 7 - Run Gesture Detection (Raspberry Pi)
 
 ```bash
 cd /home/pi/Desktop/Project_AISD/Gesture_Detection_AISD
@@ -220,4 +220,4 @@ The system successfully detects all 3 gestures in real-time:
 - [Ultralytics YOLO Documentation](https://docs.ultralytics.com)
 - [Raspberry Pi IMX500 Guide](https://docs.ultralytics.com/integrations/sony-imx500/)
 - [Label Studio](https://labelstud.io/)
-- Project Guidance — Prof. Dr. Thomas Ewender, DIT
+- Project Guidance - Prof. Dr. Thomas Ewender, DIT
