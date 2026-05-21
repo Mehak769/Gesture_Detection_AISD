@@ -1,0 +1,7 @@
+train: /home/aisd_user12/yolo-uv/split/train/images
+val: /home/aisd_user12/yolo-uv/split/val/images
+nc: 3
+names:
+- open_hand
+- thumbs_up
+- thumbs_down
