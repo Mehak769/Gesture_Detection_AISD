@@ -4,15 +4,15 @@ import os
 # ============================================
 # CHANGE THIS for each gesture you collect:
 # "thumbs_up"   or   "thumbs_down"   or   "open_hand"
-gesture_name = "open_hand"
+gesture_name = "thumbs_down"
 # ============================================
 
 save_folder = f"dataset/raw/{gesture_name}"
 os.makedirs(save_folder, exist_ok=True)
 
 cap = cv2.VideoCapture(0)
-count = 0
-total_needed = 15
+count = 15
+total_needed = 100
 
 print(f"Collecting images for: {gesture_name}")
 print("Press S to save an image")
