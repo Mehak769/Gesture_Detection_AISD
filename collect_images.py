@@ -4,7 +4,7 @@ import os
 # ============================================
 # CHANGE THIS for each gesture you collect:
 # "thumbs_up"   or   "thumbs_down"   or   "open_hand"
-gesture_name = "thumbs_down"
+gesture_name = "open_hand"
 # ============================================
 
 save_folder = f"dataset/raw/{gesture_name}"
