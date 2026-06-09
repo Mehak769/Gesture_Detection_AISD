@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+runs/
+output/
+*.onnx
+*.rpk
+packerOut.zip
+*.pt
