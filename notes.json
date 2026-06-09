@@ -1,0 +1,21 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "Palm"
+    },
+    {
+      "id": 1,
+      "name": "Thumbs down"
+    },
+    {
+      "id": 2,
+      "name": "Thumbs up"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}
