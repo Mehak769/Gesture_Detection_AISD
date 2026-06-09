@@ -1,0 +1,14 @@
+artifact_uri: file:C:/Users/karti/Desktop/Gesture_Detection/runs/mlflow/508391912831682780/d9252e19b1c04f7f91a3b67b7ff0b6c4/artifacts
+end_time: 1779896216308
+entry_point_name: ''
+experiment_id: '508391912831682780'
+lifecycle_stage: active
+run_id: d9252e19b1c04f7f91a3b67b7ff0b6c4
+run_name: train
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779894889067
+status: 3
+tags: []
+user_id: karti

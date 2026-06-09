@@ -1,0 +1,14 @@
+artifact_uri: file:C:/Users/karti/Desktop/Gesture_Detection/runs/mlflow/508391912831682780/3c712a8e87684479a0cb8bbd62af93ae/artifacts
+end_time: 1780594288560
+entry_point_name: ''
+experiment_id: '508391912831682780'
+lifecycle_stage: active
+run_id: 3c712a8e87684479a0cb8bbd62af93ae
+run_name: yolo-3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780592844971
+status: 3
+tags: []
+user_id: karti
