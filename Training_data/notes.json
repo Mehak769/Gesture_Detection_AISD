@@ -1,0 +1,21 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "open_hand"
+    },
+    {
+      "id": 1,
+      "name": "thumbs_down"
+    },
+    {
+      "id": 2,
+      "name": "thumbs_up"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}
