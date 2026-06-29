@@ -1,3 +1,0 @@
-open_hand
-thumbs_down
-thumbs_up
