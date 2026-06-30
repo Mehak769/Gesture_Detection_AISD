@@ -1,73 +1,143 @@
-# Gesture Detection AISD Project
-**Deggendorf Institute of Technology**  
-Course: AISD  
-Team: aisd_user12
+<div align="center">
+
+# ✋👍👎 Gesture Detection AISD
+
+### Real-Time Hand Gesture Recognition on Raspberry Pi 5 + IMX500 AI Camera
+
+**Deggendorf Institute of Technology** · Course: AISD · Team: `aisd_user12`
+
+[![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Ultralytics](https://img.shields.io/badge/YOLO-11n-00FFFF?logo=yolo&logoColor=black)](https://docs.ultralytics.com)
+[![Platform](https://img.shields.io/badge/Hardware-Raspberry%20Pi%205-c51a4a?logo=raspberrypi&logoColor=white)](https://www.raspberrypi.com/)
+[![Sensor](https://img.shields.io/badge/Sensor-Sony%20IMX500-orange)](https://docs.ultralytics.com/integrations/sony-imx500/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+</div>
 
 ---
 
-## Project Overview
-This project implements a real-time hand gesture detection system using a Raspberry Pi 5 with an IMX500 AI Camera. The system detects three hand gestures:
-- ✋ `open_hand` - Open hand with fingers spread
-- 👍 `thumbs_up` - Thumb pointing up
-- 👎 `thumbs_down` - Thumb pointing down
+## 📌 Project Overview
+
+This project implements a real-time, on-device hand gesture detection system using a **Raspberry Pi 5** paired with the **Sony IMX500 AI Camera**, which runs neural network inference directly on the camera sensor. A custom-trained **YOLO11n** model detects three hand gestures with no cloud or host-side inference required.
+
+| Gesture | Emoji | Description |
+|---|---|---|
+| `open_hand` | ✋ | Open hand, fingers spread |
+| `thumbs_up` | 👍 | Thumb pointing up |
+| `thumbs_down` | 👎 | Thumb pointing down |
 
 ---
 
-## Workflow
+## 🔄 Workflow
 
+```mermaid
+flowchart LR
+    A[📷 Capture Images] --> B[🏷️ Label Data]
+    B --> C[✂️ Split Train/Val]
+    C --> D[🧠 Train YOLO11n]
+    D --> E[📦 Export to IMX]
+    E --> F[🍓 Convert to RPK]
+    F --> G[🎯 Run on Raspberry Pi]
+
+    style A fill:#FFB74D,color:#000
+    style B fill:#4FC3F7,color:#000
+    style C fill:#4FC3F7,color:#000
+    style D fill:#64B5F6,color:#000
+    style E fill:#FFD54F,color:#000
+    style F fill:#81C784,color:#000
+    style G fill:#81C784,color:#000
 ```
-Capture Images → Label Data → Train YOLO Model → Export to IMX → Run on Raspberry Pi
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Laptop["💻 Laptop (Windows)"]
+        A1[Webcam] --> A2[collect_images.py]
+        A2 --> A3[300 raw images]
+    end
+
+    subgraph LabelStudio["🏷️ Label Studio"]
+        A3 --> B1[Bounding Box Annotation]
+        B1 --> B2[YOLO format export]
+    end
+
+    subgraph Workstation["🖥️ Linux Workstation - RTX A5000"]
+        B2 --> C1[prepare_training_data.py]
+        C1 --> C2[Train/Val Split]
+        C2 --> C3[train.py - YOLO11n]
+        C3 --> C4[best.pt]
+        C4 --> C5[yolo_export.py --format imx]
+        C5 --> C6[packerOut.zip + labels.txt]
+    end
+
+    subgraph Pi["🍓 Raspberry Pi 5 + IMX500"]
+        C6 --> D1[imx500-package CLI]
+        D1 --> D2[network.rpk]
+        D2 --> D3[imx500_object_detection_demo.py]
+        D3 --> D4[🎯 Live Gesture Detection]
+    end
+
+    style Laptop fill:#1e293b,color:#fff
+    style LabelStudio fill:#1e293b,color:#fff
+    style Workstation fill:#1e293b,color:#fff
+    style Pi fill:#1e293b,color:#fff
 ```
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 Gesture_Detection_AISD/
-├── dataset/
-│   └── raw/
-│       ├── thumbs_up/        # 100 images
-│       ├── thumbs_down/      # 100 images
-│       └── open_hand/        # 100 images
-├── my_training_data/         # Labeled training data (exported from Label Studio)
-│   ├── images/               # 299 annotated image files
-│   ├── labels/               # 299 YOLO annotation files
-│   ├── classes.txt           # Class names
-│   └── notes.json            # Label metadata
-├── packerOut.zip             # IMX500 deployment package
-├── labels.txt                # Class labels for deployment
-├── best.pt                   # Trained YOLO model weights
-├── collect_images.py         # Script to capture images via webcam
-└── README.md                 # This file
+├── dataset/raw/
+│   ├── thumbs_up/             # 100 images
+│   ├── thumbs_down/           # 100 images
+│   └── open_hand/             # 100 images
+├── Training_data/             # Labeled data (exported from Label Studio)
+│   ├── images/                # 372 images (299 gesture + 73 unlabeled negatives)
+│   ├── labels/                # 372 YOLO annotation files (73 empty = negatives)
+│   ├── classes.txt            # Class names
+│   └── notes.json             # Label metadata
+├── results/                   # Detection screenshots
+├── best.pt                    # Trained YOLO11n weights
+├── packerOut.zip              # IMX500 deployment package
+├── network.rpk                # Final model for Raspberry Pi
+├── labels.txt                 # Class labels for deployment
+├── collect_images.py          # Webcam capture script
+├── prepare_training_data.py   # Train/val split + YAML generator
+├── train.py                   # Training script
+├── yolo_export.py             # IMX export script
+├── yolo_config.yaml           # YOLO dataset config
+├── pyproject.toml             # Python project config + pinned dependencies (3.10)
+└── README.md
 ```
 
 ---
 
-## Step 1 - Data Collection
+## 🧪 Pipeline Walkthrough
 
-Images were captured using a laptop webcam using OpenCV:
+### Step 1 · Data Collection
 
 ```bash
 pip install opencv-python
 python collect_images.py
 ```
 
-Edit `collect_images.py` before each run:
 ```python
 gesture_name = "thumbs_up"   # change to: thumbs_down / open_hand
 total_needed = 100
 ```
 
-- **300 images collected in total** (100 per gesture)
-- 299 images successfully annotated and exported (1 skipped in Label Studio)
-- Variety tips applied: different distances, angles, lighting conditions
+- **300 gesture images collected** (100 per gesture)
+- **299 images** successfully annotated and exported (1 skipped in Label Studio)
+- Variety applied: different distances, angles, lighting conditions
 
----
+**Negative / background images (added after professor consultation):** The initial model was trained and demonstrated using only the 299 labeled gesture images. After reviewing the working prototype, our professor suggested adding unlabeled background images (no hand/gesture present) to help the model distinguish "no gesture" from the three gesture classes and reduce false positives. Following this guidance, **73 random background images** were added to the dataset and intentionally left **unlabeled** (empty `.txt` annotation files), bringing the total dataset to **372 images**.
 
-## Step 2 - Data Labeling
-
-Images were labeled using **Label Studio**:
+### Step 2 · Data Labeling
 
 ```bash
 pip install label-studio
@@ -75,50 +145,22 @@ label-studio
 ```
 
 - Project type: **Object Detection with Bounding Boxes**
-- Labels added: `open_hand`, `thumbs_up`, `thumbs_down`
-- Drew tight bounding boxes around each hand
-- Rule: label if >30% of hand is visible
+- Classes: `open_hand`, `thumbs_up`, `thumbs_down`
+- Rule: label if **>30%** of the hand is visible
 - Exported in **YOLO with Images** format
-- Result: 299 labeled images with matching `.txt` annotation files
 
----
-
-## Step 3 - Data Preparation (Linux Workstation)
-
-SSH into the Linux workstation:
+### Step 3 · Data Preparation *(Linux Workstation)*
 
 ```bash
 ssh aisd_user12@10.1.65.207
-```
-
-Transfer dataset from laptop:
-
-```bash
-scp -r my_training_data aisd_user12@10.1.65.207:/home/aisd_user12/
-```
-
-Prepare training data:
-
-```bash
+scp -r Training_data aisd_user12@10.1.65.207:/home/aisd_user12/
 cd yolo-uv
 uv run python prepare_training_data.py
 ```
 
-Edit `prepare_training_data.py` paths:
-```python
-datapath = "/home/aisd_user12/my_training_data"
-outputpath = "./data"
-train_pct = 0.8
-path_to_classes_txt = "/home/aisd_user12/my_training_data/classes.txt"
-path_to_data_yaml = "/home/aisd_user12/yolo_config.yaml"
-```
+Split result (full dataset, including negatives): **80% train (~297 imgs) / 20% val (~75 imgs)**
 
-This splits data into:
-- **80% training → 239 images**
-- **20% validation → 60 images**
-
-And creates `yolo_config.yaml`:
-
+`yolo_config.yaml`:
 ```yaml
 train: /home/aisd_user12/yolo-uv/data/train/images
 val: /home/aisd_user12/yolo-uv/data/val/images
@@ -129,17 +171,12 @@ names:
 - thumbs_up
 ```
 
----
-
-## Step 4 - Model Training (Linux Workstation)
-
-Train the YOLO11n model:
+### Step 4 · Model Training *(Linux Workstation)*
 
 ```bash
 uv run python train.py
 ```
 
-`train.py` configuration:
 ```python
 from ultralytics import YOLO
 model = YOLO('yolo11n.pt')
@@ -151,81 +188,51 @@ model.train(
 )
 ```
 
-Training results achieved:
+**Training Results (retrained on full 372-image dataset, including 73 background negatives):**
 
-| Class | Images | Precision | Recall | mAP50 | mAP50-95 |
-|-------|--------|-----------|--------|-------|----------|
-| all | 109 | 0.998 | 1.0 | 0.995 | 0.900 |
-| thumbs_up | 46 | 0.999 | 1.0 | 0.995 | 0.900 |
-| thumbs_down | 29 | 0.998 | 1.0 | 0.995 | 0.852 |
-| open_hand | 34 | 0.997 | 1.0 | 0.995 | 0.948 |
+| Class | Images | Instances | Precision | Recall | mAP50 | mAP50-95 |
+|---|---|---|---|---|---|---|
+| all | 75 | 65 | 0.993 | 1.0 | 0.995 | 0.821 |
+| open_hand | 18 | 18 | 0.994 | 1.0 | 0.995 | 0.892 |
+| thumbs_down | 28 | 28 | 0.997 | 1.0 | 0.995 | 0.737 |
+| thumbs_up | 19 | 19 | 0.988 | 1.0 | 0.995 | 0.834 |
 
-Output: `runs/detect/train-8/weights/best.pt`
+*(Validation set: 75 images, 10 of which are background/negative images with no gesture instance)*
 
----
+Output → `runs/detect/train-12/weights/best.pt`
 
-## Step 5 - Export to IMX Format (Linux Workstation)
-
-Install export tools:
+### Step 5 · Export to IMX Format *(Linux Workstation, Python 3.10 required)*
 
 ```bash
-uv pip install "edge-mdt-cl[torch]" model_compression_toolkit mct-quantizers
-```
+uv pip install "edge-mdt-cl[torch]==1.0.0" "model-compression-toolkit==2.4.5" "mct-quantizers==1.6.0"
 
-Export model:
-
-```bash
 uv run python yolo_export.py \
-  --init_model runs/detect/train-8/weights/best.pt \
+  --init_model runs/detect/train-12/weights/best.pt \
   --export_format imx \
   --export_only \
   --int8_weights
 ```
 
-Output: `runs/detect/train-8/weights/best_imx_model/packerOut.zip`
+Output → `best_imx_model/packerOut.zip` + `labels.txt`
 
-Download to laptop:
-
-```bash
-scp aisd_user12@10.1.65.207:/home/aisd_user12/yolo-uv/runs/detect/train-8/weights/best_imx_model/packerOut.zip ./
-scp aisd_user12@10.1.65.207:/home/aisd_user12/yolo-uv/runs/detect/train-8/weights/best_imx_model/labels.txt ./
-scp aisd_user12@10.1.65.207:/home/aisd_user12/yolo-uv/runs/detect/train-8/weights/best.pt ./
-```
-
----
-
-## Step 6 - Convert to RPK (Raspberry Pi)
-
-Install IMX tools (already installed):
+### Step 6 · Convert to RPK *(Raspberry Pi)*
 
 ```bash
 sudo apt install imx500-all
+imx500-package -i /home/pi/Desktop/Project_AISD/Gesture_Detection_AISD/packerOut.zip -o /home/pi/Desktop/Project_AISD/Gesture_Detection_AISD/
 ```
 
-Convert to RPK:
+Output → `network.rpk`
+
+> ⚠️ `labels.txt` order **must** match `classes.txt`: `open_hand`, `thumbs_down`, `thumbs_up`
+
+### Step 7 · Run Gesture Detection *(Raspberry Pi)*
 
 ```bash
-imx500-package -i /home/pi/packerOut.zip -o /home/pi/output_model/
-```
-
-Output: `/home/pi/output_model/network.rpk`
-
-> **Note:** `labels.txt` must match the class order used during training:
-> ```
-> open_hand
-> thumbs_down
-> thumbs_up
-> ```
-
----
-
-## Step 7 - Run Gesture Detection (Raspberry Pi)
-
-```bash
-cd picamera2/examples/imx500/
+cd /home/pi/picamera2/examples/imx500/
 python imx500_object_detection_demo.py \
-  --model /home/pi/output_model/network.rpk \
-  --labels /home/pi/labels.txt \
+  --model /home/pi/Desktop/Project_AISD/Gesture_Detection_AISD/network.rpk \
+  --labels /home/pi/Desktop/Project_AISD/Gesture_Detection_AISD/labels.txt \
   --fps 25 \
   --bbox-normalization \
   --ignore-dash-labels \
@@ -234,69 +241,92 @@ python imx500_object_detection_demo.py \
 
 ---
 
-## Results
+## 📊 Results
 
-The system successfully detects all 3 gestures in real-time:
+```mermaid
+xychart-beta
+    title "Training mAP50-95 vs Deployed Confidence (INT8, post-retrain)"
+    x-axis [open_hand, thumbs_down, thumbs_up]
+    y-axis "Score" 0 --> 1
+    bar [0.892, 0.737, 0.834]
+    bar [0.59, 0.68, 0.55]
+```
 
-| Gesture | Training mAP50 | Deployed Confidence |
-|---------|---------------|---------------------|
-| thumbs_up | 0.995 | 0.75 |
-| thumbs_down | 0.995 | 0.73 |
-| open_hand | 0.995 | 0.68 |
+| Gesture | Training mAP50 | Training mAP50-95 | Deployed Confidence (Pi, INT8) |
+|---|---|---|---|
+| ✋ open_hand | 0.995 | 0.892 | 0.59 |
+| 👎 thumbs_down | 0.995 | 0.737 | 0.68 |
+| 👍 thumbs_up | 0.995 | 0.834 | 0.55 |
 
-> ⚠️ Confidence drop from training to deployment is expected and normal. The IMX500 uses **INT8 quantization** to compress the model for embedded hardware, which reduces precision scores. This is a standard trade-off in edge AI deployment.
+> The confidence drop from training metrics to deployed inference is expected due to **INT8 quantization**, which compresses the model for embedded hardware and trades some precision for real-time, on-sensor inference speed. Interestingly, deployed confidence values are slightly **lower** after retraining with the added negative/background images compared to the original 299-image model. This is likely because the model has become more conservative — having learned to actively suppress "no gesture" predictions, it now assigns relatively lower confidence even to true positives. This trade-off (lower raw confidence, but fewer expected false positives) is worth discussing as an observation in the presentation rather than treating it as a regression.
 
-### 👍 Thumbs Up Detection
-![Thumbs Up](results/thumbs_up.png)
+### 📸 Live Detection
 
-### 👎 Thumbs Down Detection
-![Thumbs Down](results/thumbs_down.png)
-
-### ✋ Open Hand Detection
-![Open Hand](results/open_hand.png)
-
----
-
-## Constraints & Limitations
-
-- **INT8 Quantization**: Model quantized to 8-bit integers for IMX500, reducing confidence from 99.5% to ~77%
-- **Calibration Data**: INT8 calibration used only 4 COCO images (export tool limitation); more calibration images would improve accuracy
-- **Fixed Camera**: System assumes relatively fixed camera position and orientation
-- **Lighting Sensitivity**: Performance degrades in poor or inconsistent lighting
-- **Label Order**: `labels.txt` on the Pi must exactly match the class order from training `classes.txt` — mismatches cause wrong gesture labels
+| Thumbs Up | Thumbs Down | Open Hand |
+|---|---|---|
+| ![Thumbs Up](results/thumbs-up.jpeg) | ![Thumbs Down](results/thumbs-down.jpeg) | ![Open Hand](results/open-hand.jpeg) |
 
 ---
 
-## Possible Improvements
+## ⚠️ Constraints & Limitations
+
+- **INT8 Quantization** — reduces training mAP50 (~99.5%) to deployed confidence of roughly 55-68% on the Pi
+- **Calibration Data** — only 4 default COCO images used for INT8 calibration (export tool default); gesture-specific calibration data would likely improve accuracy
+- **Negative Sample Size** — 73 unlabeled background images were included to reduce false positives; this is a relatively small set and more diverse negatives (different rooms, objects, hand-like shapes) would further improve robustness
+- **Fixed Camera** — assumes a relatively fixed camera position/orientation
+- **Lighting Sensitivity** — performance degrades under poor or inconsistent lighting
+- **Label Order Sensitivity** — `labels.txt` on the Pi must exactly match the `classes.txt` training order, or gestures get mislabeled
+
+## 🚀 Possible Improvements
 
 - Use gesture-specific calibration images for INT8 export instead of default COCO images
-- Collect more images with varied backgrounds, lighting, and skin tones
+- Collect more images across backgrounds, lighting conditions, and skin tones
 - Add more gesture classes (peace sign, fist, pointing finger, etc.)
-- Implement gesture-based control for a real application (media control, smart home, etc.)
-- Apply additional data augmentation during training (rotation, brightness, contrast)
+- Build a real downstream application (media control, smart-home triggers, etc.)
+- Apply stronger data augmentation (rotation, brightness, contrast) during training
 
 ---
 
-## Hardware Used
-- Personal Laptop (Windows) with webcam — data collection
-- Linux Workstation with NVIDIA RTX A5000 GPU — model training
-- Raspberry Pi 5 (8GB) — deployment
-- Raspberry Pi AI Camera (IMX500) — real-time inference
+## 🛠️ Hardware & Software
 
-## Software Used
-- Python 3.10
+<table>
+<tr>
+<td valign="top" width="50%">
+
+**Hardware**
+- 💻 Laptop (Windows) + webcam — data collection
+- 🖥️ Linux Workstation, NVIDIA RTX A5000 — training
+- 🍓 Raspberry Pi 5 (8GB) — deployment
+- 📷 Raspberry Pi AI Camera (IMX500) — inference
+
+</td>
+<td valign="top" width="50%">
+
+**Software**
+- Python 3.10.12
 - Ultralytics YOLO 8.4.51
-- PyTorch 2.4.1 + CUDA 12.1
+- PyTorch 2.4.1 + torchvision 0.19.1 (CUDA 12.1)
 - Label Studio — annotation
 - OpenCV — image capture
-- `uv` — Python environment manager
-- `edge-mdt-cl`, `model_compression_toolkit` — IMX500 export
+- `uv` — environment manager
+- `edge-mdt-cl` 1.0.0, `model-compression-toolkit` 2.4.5, `mct-quantizers` 1.6.0 — IMX500 export
 - `picamera2` — Raspberry Pi camera interface
+
+</td>
+</tr>
+</table>
 
 ---
 
-## References
+## 📚 References
+
 - [Ultralytics YOLO Documentation](https://docs.ultralytics.com)
 - [Sony IMX500 Export Guide](https://docs.ultralytics.com/integrations/sony-imx500/)
 - [Label Studio](https://labelstud.io/)
 - Project Guidance — Prof. Dr. Thomas Ewender, DIT
+
+<div align="center">
+
+---
+
+</div>
