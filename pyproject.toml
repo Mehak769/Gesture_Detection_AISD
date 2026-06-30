@@ -1,7 +1,14 @@
 [project]
 name = "gesture-detection-aisd"
 version = "0.1.0"
-description = "Add your description here"
+description = "Real-time hand gesture detection (open_hand, thumbs_up, thumbs_down) using YOLO11n exported to Sony IMX500 for Raspberry Pi 5 deployment."
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "torch==2.4.1",
+    "torchvision==0.19.1",
+    "ultralytics==8.4.51",
+    "edge-mdt-cl==1.0.0",
+    "model-compression-toolkit==2.4.5",
+    "mct-quantizers==1.6.0",
+]
