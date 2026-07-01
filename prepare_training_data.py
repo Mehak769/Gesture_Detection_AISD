@@ -175,8 +175,8 @@ if __name__ == "__main__":
     # Set paths and parameters
     #datapath = "/path/to/your/dataset"  # Your dataset path
     datapath = '/home/aisd_user12/my_training_data'
-    outputpath = "./split"  # Where you want to save the split data
-    train_pct = 0.9  # Percentage of data used for training
+    outputpath = "./data"  # Where you want to save the split data
+    train_pct = 0.8  # Percentage of data used for training
     
     # Uncomment the line below to split your data
     split_data(datapath, outputpath, train_ratio=train_pct)
