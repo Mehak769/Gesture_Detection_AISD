@@ -9,7 +9,7 @@ Usage:
     # Set your paths and parameters
     datapath = "/path/to/your/dataset"
     outputpath = "./split"
-    train_pct = 0.9
+    train_pct = 0.8
     
     # Split the data
     split_data(datapath, outputpath, train_ratio=train_pct)
